@@ -52,7 +52,7 @@ app.get("/products",function(req,res,next){
   })
 })
 
-app.get("purchases/:filterby/:id",function(req,res,next){
+app.get("/purchases/:filterby/:id",function(req,res,next){
   const filterby = req.params.filterby;
   const id = +req.params.id;
   let query;
