@@ -85,55 +85,41 @@ app.get("/totalPurchase/:filterby/:id",function(req,res,next){
     client.end();
   });
 });
-  
-app.get("/purchases", function(req, res, next) {
-  const { shop = "", product = [], sort = "" } = req.query;
+
+app.get("/purchases",function(req,res,next){
+  const {shop = "", product = [], sort = ""} = req.query;
   let query = "SELECT shopid, productid, quantity, price FROM purchases";
   let condition = [];
-  let orderBy = "";
-  let orderByValue;
-  let placeholderIndex = 1;
-  let placeholders = [];
-  
-  if (shop) {
-    condition.push("shopid = $" + placeholderIndex);
-    placeholders.push(shop);
-    placeholderIndex++;
+  let orderby;
+  if(shop){
+    condition.push(`shopid= ${shop}`)
   }
-  if (product.length > 0) {
-    condition.push("productid IN (" + product.map(() => "$" + placeholderIndex++).join(", ") + ")");
-    placeholders.push(...product);
+  if(product.length>0){
+    condition.push(`productid IN (${product})`);
   }
-  if (sort === "QtyAsc") {
-    orderBy = "ORDER BY quantity ASC";
-    orderByValue = "quantity";
+  if(sort=="QtyAsc"){
+    orderby = "ORDER BY quantity ASC";
   }
-  if (sort === "QtyDesc") {
-    orderBy = "ORDER BY quantity DESC";
-    orderByValue = "quantity";
+  if(sort=="QtyDesc"){
+    orderby = "ORDER BY quantity DESC";
   }
-  if (sort === "ValueAsc") {
-    orderBy = "ORDER BY (quantity * price) ASC";
-    orderByValue = "quantity * price";
+  if(sort=="ValueAsc"){
+    orderby = "ORDER BY (quantity * price) ASC";
   }
-  if (sort === "ValueDesc") {
-    orderBy = "ORDER BY (quantity * price) DESC";
-    orderByValue = "quantity * price";
+  if(sort=="ValueDesc"){
+    orderby = "ORDER BY (quantity * price) DESC";
   }
-  
-  if (condition.length > 0) {
-    query += " WHERE " + condition.join(" AND ");
+  if(condition.length>0){
+    query += ' WHERE '+ condition.join(" AND ")
   }
-  if (orderBy) {
-    query += " " + orderBy;
+  if(sort!=""){
+    query += orderby;
   }
-  
-  client.query(query, placeholders, function(err, result) {
+  client.query(query,function(err, result) {
     if (err) return res.status(440).send(err);
     return res.send(result.rows);
   });
-});
-
+})
 
 /////////////////////////////////////////////////////////////POST SECTION////////////////////////////////////////////////////////////////////
 
